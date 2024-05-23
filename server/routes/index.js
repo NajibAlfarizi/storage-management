@@ -1,4 +1,5 @@
 const routes = require("express").Router();
+const categoryRoutes = require("./category");
 const productRoutes = require("./product");
 
 routes.get("/", (req, res) => {
@@ -6,5 +7,6 @@ routes.get("/", (req, res) => {
 });
 
 routes.use("/product", productRoutes);
+routes.use("/category", categoryRoutes);
 
 module.exports = routes;
