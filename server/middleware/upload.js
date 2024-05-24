@@ -1,8 +1,8 @@
 const multer = require("multer");
 const path = require("path");
 
-// Set storage engine
-const storage = multer.diskStorage({
+// Set storage engine product
+const storageProduct = multer.diskStorage({
   destination: "./public/uploads/products/", // Change to products folder
   filename: (req, file, cb) => {
     cb(
@@ -12,14 +12,34 @@ const storage = multer.diskStorage({
   },
 });
 
+// set storage engine user
+const storageUser = multer.diskStorage({
+  destination: "./public/uploads/users/", // Change to users folder
+  filename: (req, file, cb) => {
+    cb(
+      null,
+      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
+    );
+  },
+});
+
 // Initialize upload
-const upload = multer({
-  storage: storage,
+const uploadProduct = multer({
+  storage: storageProduct,
   limits: { fileSize: 1000000 }, // 1MB limit
   fileFilter: (req, file, cb) => {
     checkFileType(file, cb);
   },
 }).single("url");
+
+// upload user
+const uploadUser = multer({
+  storage: storageUser,
+  limits: { fileSize: 1000000 }, // 1MB limit
+  fileFilter: (req, file, cb) => {
+    checkFileType(file, cb);
+  },
+}).single("image");
 
 // Check file type
 function checkFileType(file, cb) {
@@ -37,4 +57,7 @@ function checkFileType(file, cb) {
   }
 }
 
-module.exports = upload;
+module.exports = {
+  uploadProduct,
+  uploadUser,
+};

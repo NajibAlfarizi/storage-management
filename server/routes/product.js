@@ -6,9 +6,13 @@ productRoutes.get("/", productController.getAllProducts);
 
 productRoutes.get("/:id", productController.getProductById);
 
-productRoutes.post("/", upload, productController.createProduct);
+productRoutes.post("/", upload.uploadProduct, productController.createProduct);
 
-productRoutes.put("/:id", upload, productController.updateProduct);
+productRoutes.put(
+  "/:id",
+  upload.uploadProduct,
+  productController.updateProduct
+);
 
 productRoutes.delete("/:id", productController.deleteProduct);
 
