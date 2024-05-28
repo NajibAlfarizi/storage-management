@@ -119,10 +119,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           );
                           // Tunggu beberapa detik sebelum pindah ke halaman Home
                           Future.delayed(Duration(seconds: 2), () {
-                            Navigator.pushReplacement(
+                            Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => HomePage()),
+                                  builder: (context) => HomeScreen()),
+                              (Route<dynamic> route) => false,
                             );
                           });
                         }

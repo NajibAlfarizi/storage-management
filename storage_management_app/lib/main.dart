@@ -8,7 +8,6 @@ import 'package:storage_management_app/screens/home_screen.dart';
 import 'package:storage_management_app/screens/login_screen.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
   runApp(
     MultiProvider(
       providers: [
@@ -22,22 +21,21 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return OverlaySupport(
+    return OverlaySupport.global(
       child: MaterialApp(
-        initialRoute: '/',
-        routes: {
-          '/': (context) => Consumer<AuthProvider>(
-                builder: (context, authProvider, child) {
-                  if (authProvider.isAuthenticated()) {
-                    return HomePage();
-                  } else {
-                    return LoginScreen();
-                  }
-                },
-              ),
-          '/login': (context) => LoginScreen(),
-          '/home': (context) => HomePage(),
-        },
+        title: 'Storage Management App',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: Consumer<AuthProvider>(
+          builder: (context, authProvider, child) {
+            if (authProvider.isAuthenticated()) {
+              return HomeScreen();
+            } else {
+              return LoginScreen();
+            }
+          },
+        ),
       ),
     );
   }
