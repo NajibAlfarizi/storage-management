@@ -6,7 +6,19 @@ class ProfileTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text('Profile Tab Content'),
-    );
+        child: Center(
+      child: SingleChildScrollView(
+        padding: EdgeInsets.all(24),
+        child: Text(
+          'My Profile',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+            fontFamily: 'Poppins',
+          ),
+        ),
+      ),
+    ));
   }
 }

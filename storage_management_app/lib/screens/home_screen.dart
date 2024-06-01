@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors, library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, use_key_in_widget_constructors
 
 import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -26,23 +26,29 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _checkTokenExpiration();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkTokenExpiration();
+    });
   }
 
   void _checkTokenExpiration() {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    if (authProvider.loginModel != null &&
-        authProvider.loginModel!.token != null) {
-      bool isExpired = JwtDecoder.isExpired(authProvider.loginModel!.token!);
+    if (authProvider.token != null) {
+      bool isExpired = JwtDecoder.isExpired(authProvider.token!);
       if (isExpired) {
-        authProvider.logout();
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => LoginScreen()),
-          (Route<dynamic> route) => false,
-        );
+        _handleTokenExpiration();
       }
     }
+  }
+
+  void _handleTokenExpiration() {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    authProvider.logout(context);
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => LoginScreen()),
+      (Route<dynamic> route) => false,
+    );
   }
 
   void _onItemTapped(int index) {
@@ -63,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: Icon(Icons.logout),
             onPressed: () {
-              authProvider.logout();
+              authProvider.logout(context);
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => LoginScreen()),
