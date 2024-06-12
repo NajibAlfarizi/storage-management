@@ -10,10 +10,6 @@ function generateOtp() {
 
 const register = async (req, res) => {
   const { username, password } = req.body;
-  const image = req.file
-    ? `/uploads/users/${req.file.filename}`
-    : "/uploads/default.png";
-
   // validasi username
   if (!username.includes("@gmail.com")) {
     return res.status(400).json({
@@ -29,12 +25,17 @@ const register = async (req, res) => {
       });
     }
 
+    let imageUrl =
+      "https://res.cloudinary.com/djgrhxns8/image/upload/v1718207307/uploads/v5s0fo7ptl0o2zwwrbqb.png";
+    if (req.file && req.file.path) {
+      imageUrl = req.file.path; // URL from Cloudinary
+    }
     const hashedPassword = await bcrypt.hash(password, 10);
     const otp = generateOtp().toString();
     const user = await User.create({
       username,
       password: hashedPassword,
-      image,
+      image: imageUrl,
       otp,
     });
 
@@ -133,7 +134,6 @@ const login = async (req, res) => {
 };
 
 const getProfile = async (req, res) => {
-  const id = +req.params.id;
   try {
     const user = await User.findByPk(req.user.id, {
       attributes: { exclude: ["password"] },
@@ -154,9 +154,6 @@ const getProfile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   const { password } = req.body;
-  const image = req.file
-    ? `/uploads/users/${req.file.filename}`
-    : `/uploads/default.png`;
 
   try {
     const user = await User.findByPk(req.user.id);
@@ -171,9 +168,12 @@ const updateProfile = async (req, res) => {
       user.password = await bcrypt.hash(password, 10);
     }
 
-    if (req.file) {
-      user.image = image;
+    let imageUrl = user.image;
+    if (req.file && req.file.path) {
+      imageUrl = req.file.path; // URL from Cloudinary
     }
+
+    user.image = imageUrl;
 
     await user.save();
 

@@ -1,8 +1,16 @@
-const { Category } = require("../models");
+const { Model } = require("sequelize");
+const { Category, Product } = require("../models");
 
 const getAllCategories = async (req, res) => {
   try {
-    const categories = await Category.findAll();
+    const categories = await Category.findAll({
+      include: [
+        {
+          model: Product,
+          as: "products",
+        },
+      ],
+    });
     res.json(categories);
   } catch (error) {
     res.status(500).json({
@@ -14,7 +22,14 @@ const getAllCategories = async (req, res) => {
 const getCategoryById = async (req, res) => {
   const id = +req.params.id;
   try {
-    const category = await Category.findByPk(id);
+    const category = await Category.findByPk(id, {
+      include: [
+        {
+          model: Product,
+          as: "products",
+        },
+      ],
+    });
     if (!category) {
       return res.status(404).json({
         error: "category not found",

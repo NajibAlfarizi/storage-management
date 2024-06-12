@@ -1,16 +1,20 @@
 const userRoutes = require("express").Router();
 const userController = require("../controllers/authController");
-const upload = require("../middleware/upload");
+const { uploadUserImage } = require("../middleware/multer");
 const authMiddleware = require("../middleware/auth");
 
-userRoutes.post("/register", upload.uploadUser, userController.register);
+userRoutes.post(
+  "/register",
+  uploadUserImage.single("image"),
+  userController.register
+);
 userRoutes.post("/complete-register", userController.completeRegistration);
 userRoutes.post("/login", userController.login);
 userRoutes.get("/profile", authMiddleware, userController.getProfile);
 userRoutes.put(
   "/profile",
   authMiddleware,
-  upload.uploadUser,
+  uploadUserImage.single("image"),
   userController.updateProfile
 );
 

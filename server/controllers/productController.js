@@ -1,4 +1,4 @@
-const { Product } = require("../models");
+const { Product, Category } = require("../models");
 const getAllProducts = async (req, res) => {
   try {
     const product = await Product.findAll();
@@ -28,46 +28,72 @@ const getProductById = async (req, res) => {
 };
 
 const createProduct = async (req, res) => {
-  const { name, qty, createdBy, updatedBy } = req.body;
-  const url = req.file
-    ? `/uploads/products/${req.file.filename}`
-    : "/uploads/products/default.png";
+  const { name, qty, categoryId } = req.body;
+  let imageUrl =
+    "https://res.cloudinary.com/djgrhxns8/image/upload/v1718207307/uploads/v5s0fo7ptl0o2zwwrbqb.png"; // Default image
+  if (req.file && req.file.path) {
+    imageUrl = req.file.path; // URL from Cloudinary
+  }
   try {
+    const category = await Category.findByPk(req.body.categoryId);
+    if (!category) {
+      return res.status(404).json({
+        error: "category not found",
+      });
+    }
     const product = await Product.create({
       name,
       qty,
-      url,
-      createdBy,
-      updatedBy,
+      url: imageUrl,
+      categoryId,
+      createdBy: req.user.username,
+      updatedBy: req.user.username,
     });
     res.status(201).json(product);
   } catch (error) {
     res.status(500).json({
-      error: "failed to create product",
+      message: error.message,
     });
   }
 };
 
 const updateProduct = async (req, res) => {
-  const id = +req.params.id;
-  const { name, qty, updatedBy } = req.body;
-  const url = req.file ? `/uploads/products/${req.file.filename}` : null;
+  const { name, qty, categoryId } = req.body;
+  const productId = req.params.id;
+
   try {
-    const product = await Product.findByPk(id);
+    const product = await Product.findByPk(productId);
     if (!product) {
       return res.status(404).json({
-        error: "product not found",
+        error: "Product not found",
       });
     }
-    const updateData = { name, qty, updatedBy };
-    if (url) {
-      updateData.url = url;
+
+    const category = await Category.findByPk(categoryId);
+    if (!category) {
+      return res.status(404).json({
+        error: "Category not found",
+      });
     }
-    await product.update(updateData);
-    res.json(product);
+
+    let imageUrl = product.url; // Existing image URL
+    if (req.file && req.file.path) {
+      imageUrl = req.file.path; // New URL from Cloudinary
+    }
+
+    product.name = name || product.name;
+    product.qty = qty || product.qty;
+    product.url = imageUrl;
+    product.categoryId = categoryId;
+    product.updatedBy = req.user.username;
+
+    await product.save();
+
+    res.status(200).json(product);
   } catch (error) {
+    console.error("Error updating product: ", error);
     res.status(500).json({
-      error: "failed to update product",
+      error: "Failed to update product",
     });
   }
 };
