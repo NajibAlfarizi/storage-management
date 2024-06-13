@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, sized_box_for_whitespace
+// ignore_for_file: prefer_const_constructors, sized_box_for_whitespace, use_key_in_widget_constructors
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -11,6 +11,8 @@ class HomeTab extends StatefulWidget {
 }
 
 class _HomeTabState extends State<HomeTab> {
+  String? _selectedCategory;
+
   @override
   void initState() {
     super.initState();
@@ -58,9 +60,29 @@ class _HomeTabState extends State<HomeTab> {
                     itemBuilder: (context, index) {
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Chip(
-                          label: Text(
-                              categories[index].name ?? 'Unknown category'),
+                        child: InkWell(
+                          onTap: () async {
+                            setState(() {
+                              _selectedCategory = categories[index].name;
+                            });
+                            if (categories[index].id != null) {
+                              await categoryProvider
+                                  .fetchCategoryById(categories[index].id!);
+                            }
+                          },
+                          child: Chip(
+                            label: Text(categories[index].name ??
+                                'product name undefined'),
+                            backgroundColor:
+                                _selectedCategory == categories[index].name
+                                    ? const Color.fromARGB(255, 1, 28, 74)
+                                    : Colors.white,
+                            labelStyle: TextStyle(
+                              color: _selectedCategory == categories[index].name
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
+                          ),
                         ),
                       );
                     },
@@ -74,7 +96,7 @@ class _HomeTabState extends State<HomeTab> {
                   ),
                 ),
                 GridView.builder(
-                  padding: EdgeInsets.all(16),
+                  padding: EdgeInsets.all(12.0),
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -82,9 +104,17 @@ class _HomeTabState extends State<HomeTab> {
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,
                   ),
-                  itemCount: products.length,
+                  itemCount: _selectedCategory != null
+                      ? categoryProvider
+                          .getProductsByCategoryId(_selectedCategory!)
+                          .length
+                      : products.length,
                   itemBuilder: (context, index) {
-                    final product = products[index];
+                    final product = _selectedCategory != null
+                        ? categoryProvider
+                            .getProductsByCategoryId(_selectedCategory!)[index]
+                        : products[index];
+
                     return Card(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,18 +131,11 @@ class _HomeTabState extends State<HomeTab> {
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Text(product.name ?? 'Unknown product',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                )),
+                            child: Text(product.name ?? ''),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Text('Qty: ${product.qty ?? 0}',
-                                style: TextStyle(
-                                  fontStyle: FontStyle.italic,
-                                )),
+                            child: Text('Qty: ${product.qty}'),
                           ),
                         ],
                       ),
