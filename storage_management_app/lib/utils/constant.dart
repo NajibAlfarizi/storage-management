@@ -1,3 +1,3 @@
 class Constants {
-  static const String apiUrl = 'http://192.168.24.190:3000';
+  static const String apiUrl = 'http://192.168.246.190:3000';
 }
