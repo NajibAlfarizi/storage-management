@@ -24,8 +24,8 @@ class Product {
       qty: json['qty'] as int?,
       url: json['url'] as String?,
       categoryId: json['category_id'] as int?,
-      createdBy: json['created_by'] as String?,
-      updatedBy: json['updated_by'] as String?,
+      createdBy: json['createdBy'] as String?,
+      updatedBy: json['updatedBy'] as String?,
     );
   }
 }

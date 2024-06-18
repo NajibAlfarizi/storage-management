@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:storage_management_app/models/login_model.dart';
+import 'package:storage_management_app/models/user_model.dart';
 import 'package:storage_management_app/utils/constant.dart';
 import 'package:storage_management_app/utils/shared_preferences.dart';
 
@@ -12,6 +13,8 @@ class AuthProvider extends ChangeNotifier {
   String? _token;
   DateTime? _tokenExpiry;
   LoginModel? _loginModel;
+  UserModel? _user;
+  UserModel? get user => _user;
 
   LoginModel? get loginModel => _loginModel;
   String? get token => _token;
@@ -19,6 +22,8 @@ class AuthProvider extends ChangeNotifier {
   AuthProvider() {
     _loadToken();
   }
+
+  get username => null;
 
   Future<void> _loadToken() async {
     final token = await SharedPreferencesUtil.getToken();
@@ -120,26 +125,28 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  // Future<void> _fetchUserProfile() async {
-  //   if (_token == null) return;
-  //   try {
-  //     final response = await http.get(
-  //       Uri.parse(Constants.apiUrl + '/user/profile'),
-  //       headers: {'Authorization': 'Bearer $_token'},
-  //     );
+  Future<void> fetchUserProfile() async {
+    if (_token == null) return;
+    try {
+      final response = await http.get(
+        Uri.parse(Constants.apiUrl + '/user/profile'),
+        headers: {'Authorization': 'Bearer $_token'},
+      );
 
-  //     if (response.statusCode == 200) {
-  //       final responseData = jsonDecode(response.body);
-  //       _user = UserModel.fromJson(responseData);
-  //       notifyListeners();
-  //     } else {
-  //       print(
-  //           'Failed to load user profile with status: ${response.statusCode}');
-  //     }
-  //   } catch (e) {
-  //     print('An error occurred while fetching user profile: $e');
-  //   }
-  // }
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        final user = UserModel.fromJson(responseData);
+        _user = user;
+
+        notifyListeners();
+      } else {
+        print(
+            'Failed to load user profile with status: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('An error occurred while fetching user profile: $e');
+    }
+  }
 
   Future<void> logout(BuildContext? context) async {
     await SharedPreferencesUtil.removeToken();

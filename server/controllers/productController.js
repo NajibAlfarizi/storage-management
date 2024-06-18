@@ -69,7 +69,7 @@ const updateProduct = async (req, res) => {
       });
     }
 
-    const category = await Category.findByPk(categoryId);
+    const category = await Category.findByPk(parseInt(categoryId, 10));
     if (!category) {
       return res.status(404).json({
         error: "Category not found",
@@ -84,7 +84,7 @@ const updateProduct = async (req, res) => {
     product.name = name || product.name;
     product.qty = qty || product.qty;
     product.url = imageUrl;
-    product.categoryId = categoryId;
+    product.categoryId = parseInt(categoryId, 10);
     product.updatedBy = req.user.username;
 
     await product.save();

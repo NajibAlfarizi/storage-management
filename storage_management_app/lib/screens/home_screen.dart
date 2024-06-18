@@ -5,8 +5,7 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:provider/provider.dart';
 import 'package:storage_management_app/providers/auth_provider.dart';
 import 'package:storage_management_app/screens/login_screen.dart';
-import 'package:storage_management_app/screens/tab_screens/home_tab.dart';
-import 'package:storage_management_app/screens/tab_screens/product_categories_tab.dart';
+import 'package:storage_management_app/screens/tab_screens/catalog_tab.dart';
 import 'package:storage_management_app/screens/tab_screens/profile_tab.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -18,8 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    HomeTab(),
-    ProductTab(),
+    CatalogTab(),
     ProfileTab(),
   ];
 
@@ -63,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home'),
+        title: Text('Storage Management App'),
         automaticallyImplyLeading: false, // Disable the back button
         actions: [
           IconButton(
@@ -85,10 +83,6 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.category),
-            label: 'Product & Category',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
