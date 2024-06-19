@@ -193,15 +193,6 @@ class _CatalogTabState extends State<CatalogTab> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                icon: Icon(Icons.edit),
-                                color: Colors.blue,
-                                onPressed: () {
-                                  // navigate to edit product screen
-                                  // Navigator.pushNamed(context, '/edit-product',
-                                  //     arguments: product);
-                                },
-                              ),
-                              IconButton(
                                 icon: Icon(Icons.delete),
                                 color: Colors.red,
                                 onPressed: () async {
