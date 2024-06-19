@@ -57,25 +57,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context);
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Storage Management App'),
         automaticallyImplyLeading: false, // Disable the back button
-        actions: [
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: () {
-              authProvider.logout(context);
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => LoginScreen()),
-                (Route<dynamic> route) => false,
-              );
-            },
-          ),
-        ],
       ),
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(

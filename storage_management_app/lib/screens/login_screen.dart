@@ -1,4 +1,4 @@
-// ignore_for_file: use_key_in_widget_constructors, prefer_const_constructors, use_build_context_synchronously, library_private_types_in_public_api
+// ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors, library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -34,7 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 SvgPicture.asset(
-                  'lib/assets/icons/icon_login.svg', // Pastikan Anda memiliki ikon SVG ini
+                  'lib/assets/icons/icon_login.svg',
                   height: 200,
                 ),
                 SizedBox(height: 20),
@@ -97,40 +97,28 @@ class _LoginScreenState extends State<LoginScreen> {
                     return null;
                   },
                 ),
-                SizedBox(height: 8),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {},
-                    child: Text('Forgot password?'),
-                  ),
-                ),
                 SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState?.validate() ?? false) {
-                      try {
-                        await authProvider.login(username, password);
-                        if (authProvider.isAuthenticated()) {
-                          // Tampilkan notifikasi sukses login menggunakan overlay_support
-                          showSimpleNotification(
-                            Text("Login Success"),
-                            background: Colors.green,
-                          );
-                          // Tunggu beberapa detik sebelum pindah ke halaman Home
-                          Future.delayed(Duration(seconds: 2), () {
-                            if (mounted) {
-                              Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => HomeScreen()),
-                                (Route<dynamic> route) => false,
-                              );
-                            }
-                          });
-                        }
-                      } catch (e) {
-                        // Tampilkan notifikasi error menggunakan overlay_support
+                      bool loginSuccess =
+                          await authProvider.login(username, password);
+                      if (loginSuccess) {
+                        showSimpleNotification(
+                          Text("Login Success"),
+                          background: Colors.green,
+                        );
+                        Future.delayed(Duration(seconds: 2), () {
+                          if (mounted) {
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => HomeScreen()),
+                              (Route<dynamic> route) => false,
+                            );
+                          }
+                        });
+                      } else {
                         showSimpleNotification(
                           Text("Username or password is incorrect"),
                           background: Colors.red,
@@ -150,19 +138,18 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 SizedBox(height: 8),
-                // Teks untuk register
                 TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => RegisterScreen()),
-                      );
-                    },
-                    child: Text(
-                      "Don't have an account? Register",
-                      style: TextStyle(fontSize: 16, color: Colors.black),
-                    ))
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => RegisterScreen()),
+                    );
+                  },
+                  child: Text(
+                    "Don't have an account? Register",
+                    style: TextStyle(fontSize: 16, color: Colors.black),
+                  ),
+                )
               ],
             ),
           ),

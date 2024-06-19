@@ -54,10 +54,6 @@ class AuthProvider extends ChangeNotifier {
         _token = responseData['token'];
         _tokenExpiry = JwtDecoder.getExpirationDate(_token!);
 
-        // Print token to console
-        // print('Token received: $_token');
-        // print('Token expires at: $_tokenExpiry');
-
         await SharedPreferencesUtil.saveToken(_token!, _tokenExpiry!);
         // await _fetchUserProfile();
         _scheduleTokenExpiryCheck();
@@ -145,6 +141,36 @@ class AuthProvider extends ChangeNotifier {
       }
     } catch (e) {
       print('An error occurred while fetching user profile: $e');
+    }
+  }
+
+  Future<void> updateProfile({String? password, String? image}) async {
+    final token = await SharedPreferencesUtil.getToken();
+    if (token == null) return;
+    try {
+      var request = http.MultipartRequest(
+        'PUT',
+        Uri.parse('${Constants.apiUrl}/profile'),
+      );
+      request.headers['Authorization'] = 'Bearer $token';
+      request.fields['password'] = password ?? '';
+
+      if (password != null && password.isNotEmpty) {
+        request.fields['password'] = password;
+      }
+
+      if (image != null && image.isNotEmpty) {
+        request.files.add(await http.MultipartFile.fromPath('image', image));
+      }
+
+      var response = await request.send();
+      if (response.statusCode == 200) {
+        print('Profile updated successfully');
+      } else {
+        print('Failed to update profile with status: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('An error occurred while updating profile: $e');
     }
   }
 

@@ -12,36 +12,31 @@ import 'package:storage_management_app/screens/login_screen.dart';
 import 'package:storage_management_app/screens/home_screen.dart';
 
 void main() {
-  runApp(
-    MyApp(),
-  );
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return OverlaySupport(
+    return OverlaySupport.global(
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => AuthProvider()),
           ChangeNotifierProvider(create: (_) => CategoryProvider()),
           ChangeNotifierProvider(create: (_) => ProductProvider()),
         ],
-        child: MaterialApp(
-          title: 'Storage Management App',
-          initialRoute: '/',
-          routes: {
-            '/': (context) {
-              final authProvider =
-                  Provider.of<AuthProvider>(context, listen: false);
-              return authProvider.isAuthenticated()
-                  ? HomeScreen()
-                  : LoginScreen();
-            },
-            '/login': (context) => LoginScreen(),
-            '/home': (context) => HomeScreen(),
-            '/addCategoryForm': (context) => AddCategoryForm(),
-            '/add-product': (context) => AddProductScreen(),
+        child: Consumer<AuthProvider>(
+          builder: (context, authProvider, _) {
+            return MaterialApp(
+              title: 'Storage Management App',
+              initialRoute: authProvider.isAuthenticated() ? '/home' : '/login',
+              routes: {
+                '/login': (context) => LoginScreen(),
+                '/home': (context) => HomeScreen(),
+                '/addCategoryForm': (context) => AddCategoryForm(),
+                '/add-product': (context) => AddProductScreen(),
+              },
+            );
           },
         ),
       ),
