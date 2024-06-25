@@ -1,5 +1,6 @@
 "use strict";
 const { Model } = require("sequelize");
+
 module.exports = (sequelize, DataTypes) => {
   class Category extends Model {
     /**
@@ -16,7 +17,15 @@ module.exports = (sequelize, DataTypes) => {
   }
   Category.init(
     {
-      name: DataTypes.STRING,
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      createdBy: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: "system", // Set a default value to avoid issues with existing records
+      },
     },
     {
       sequelize,

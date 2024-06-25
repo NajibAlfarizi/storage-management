@@ -1,11 +1,14 @@
 const { Product, Category } = require("../models");
 const getAllProducts = async (req, res) => {
   try {
-    const product = await Product.findAll();
-    res.json(product);
+    const username = req.user.username; // Mendapatkan username dari token JWT
+    const products = await Product.findAll({
+      where: { createdBy: username },
+    });
+    res.json(products);
   } catch (error) {
     res.status(500).json({
-      error: "failed to get products",
+      error: "Failed to get products",
     });
   }
 };
@@ -13,10 +16,16 @@ const getAllProducts = async (req, res) => {
 const getProductById = async (req, res) => {
   const id = +req.params.id;
   try {
-    const product = await Product.findByPk(id);
+    const username = req.user.username; // Mendapatkan username dari token JWT
+    const product = await Product.findOne({
+      where: {
+        id: id,
+        createdBy: username,
+      },
+    });
     if (!product) {
       return res.status(404).json({
-        error: "product not found",
+        error: "Product not found or you do not have access to this product",
       });
     }
     res.json(product);

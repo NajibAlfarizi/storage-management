@@ -1,20 +1,23 @@
-const { Model } = require("sequelize");
 const { Category, Product } = require("../models");
 
 const getAllCategories = async (req, res) => {
   try {
+    const username = req.user.username;
     const categories = await Category.findAll({
+      where: { createdBy: username },
       include: [
         {
           model: Product,
           as: "products",
+          where: { createdBy: username },
+          required: false,
         },
       ],
     });
     res.json(categories);
   } catch (error) {
     res.status(500).json({
-      error: "failed to get categories",
+      error: "Failed to get categories",
     });
   }
 };
@@ -22,23 +25,30 @@ const getAllCategories = async (req, res) => {
 const getCategoryById = async (req, res) => {
   const id = +req.params.id;
   try {
-    const category = await Category.findByPk(id, {
+    const username = req.user.username;
+    const category = await Category.findOne({
+      where: {
+        id: id,
+        createdBy: username,
+      },
       include: [
         {
           model: Product,
           as: "products",
+          where: { createdBy: username },
+          required: false,
         },
       ],
     });
     if (!category) {
       return res.status(404).json({
-        error: "category not found",
+        error: "Category not found or you do not have access to this category",
       });
     }
     res.json(category);
   } catch (error) {
     res.status(500).json({
-      error: "failed to get category",
+      error: "Failed to get category",
     });
   }
 };
@@ -48,11 +58,12 @@ const createCategory = async (req, res) => {
   try {
     const category = await Category.create({
       name,
+      createdBy: req.user.username,
     });
     res.status(201).json(category);
   } catch (error) {
     res.status(500).json({
-      error: "failed to create category",
+      error: "Failed to create category",
     });
   }
 };
@@ -61,17 +72,23 @@ const updateCategory = async (req, res) => {
   const id = +req.params.id;
   const { name } = req.body;
   try {
-    const category = await Category.findByPk(id);
+    const username = req.user.username;
+    const category = await Category.findOne({
+      where: {
+        id: id,
+        createdBy: username,
+      },
+    });
     if (!category) {
       return res.status(404).json({
-        error: "category not found",
+        error: "Category not found or you do not have access to this category",
       });
     }
     await category.update({ name });
     res.json(category);
   } catch (error) {
     res.status(500).json({
-      error: "failed to update category",
+      error: "Failed to update category",
     });
   }
 };
@@ -79,17 +96,23 @@ const updateCategory = async (req, res) => {
 const deleteCategory = async (req, res) => {
   const id = +req.params.id;
   try {
-    const category = await Category.findByPk(id);
+    const username = req.user.username;
+    const category = await Category.findOne({
+      where: {
+        id: id,
+        createdBy: username,
+      },
+    });
     if (!category) {
       return res.status(404).json({
-        error: "category not found",
+        error: "Category not found or you do not have access to this category",
       });
     }
     await category.destroy();
-    res.json({ message: "category deleted" });
+    res.json({ message: "Category deleted" });
   } catch (error) {
     res.status(500).json({
-      error: "failed to delete category",
+      error: "Failed to delete category",
     });
   }
 };
